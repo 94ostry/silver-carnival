@@ -1,0 +1,40 @@
+services:
+  core-service:
+    build:
+      context: ./core-service
+    image: silver-carnival/core-service:latest
+    ports:
+      - "8081:8081"
+
+  processing-service:
+    build:
+      context: ./processing-service
+    image: silver-carnival/processing-service:latest
+    ports:
+      - "8082:8082"
+
+  import-service:
+    build:
+      context: ./import-service
+    image: silver-carnival/import-service:latest
+    ports:
+      - "8083:8083"
+
+  task-service:
+    build:
+      context: ./task-service
+    image: silver-carnival/task-service:latest
+    ports:
+      - "8084:8084"
+
+  proxy:
+    build:
+      context: ./proxy
+    image: silver-carnival/proxy:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - core-service
+      - processing-service
+      - import-service
+      - task-service
