@@ -5,6 +5,12 @@ services:
     image: silver-carnival/core-service:latest
     deploy:
       replicas: 2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/core/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   processing-service:
     build:
@@ -12,6 +18,12 @@ services:
     image: silver-carnival/processing-service:latest
     deploy:
       replicas: 2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/api/processing/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   import-service:
     build:
@@ -19,6 +31,12 @@ services:
     image: silver-carnival/import-service:latest
     ports:
       - "8083:8083"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/api/import/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   task-service:
     build:
@@ -26,6 +44,12 @@ services:
     image: silver-carnival/task-service:latest
     deploy:
       replicas: 2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/api/task/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   proxy:
     build:
@@ -34,7 +58,11 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - core-service
-      - processing-service
-      - import-service
-      - task-service
+      core-service:
+        condition: service_healthy
+      processing-service:
+        condition: service_healthy
+      import-service:
+        condition: service_healthy
+      task-service:
+        condition: service_healthy
