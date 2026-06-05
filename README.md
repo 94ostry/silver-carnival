@@ -25,7 +25,7 @@ docker compose up
 ```
 
 Proxy routes:
-- `http://localhost:8080/core/api/core/health`
-- `http://localhost:8080/processing/api/processing/health`
-- `http://localhost:8080/import/api/import/health`
-- `http://localhost:8080/task/api/task/health`
+- `http://localhost:8080/core/health`
+- `http://localhost:8080/processing/health`
+- `http://localhost:8080/import/health`
+- `http://localhost:8080/task/health`
