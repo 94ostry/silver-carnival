@@ -36,6 +36,7 @@ ROLLING_REPLICAS=2          # matches docker-compose.yml deploy.replicas
 # Health-check settings (seconds).
 HEALTH_TIMEOUT=120          # maximum wait per container
 HEALTH_INTERVAL=5           # poll interval
+CONTAINER_SHUTDOWN_GRACE=2  # seconds to allow a stopped container to exit cleanly
 
 # Colour helpers (no-op when not a terminal).
 if [ -t 1 ]; then
@@ -115,7 +116,7 @@ rolling_update() {
             "$service"
 
         # Allow a moment for the removed container to exit cleanly.
-        sleep 2
+        sleep "$CONTAINER_SHUTDOWN_GRACE"
     done
 
     # Final health confirmation.
@@ -141,14 +142,12 @@ docker compose -f "$COMPOSE_FILE" build \
     "${ROLLING_SERVICES[@]}" import-service
 
 # Tag images with the requested version (in addition to :latest used in compose).
-for svc in "${ROLLING_SERVICES[@]}" import-service; do
-    local_image="silver-carnival/${svc}:latest"
-    versioned_image="silver-carnival/${svc}:${NEW_VERSION}"
-    if [ "$NEW_VERSION" != "latest" ]; then
-        docker tag "$local_image" "$versioned_image"
-        log "Tagged ${local_image} → ${versioned_image}"
-    fi
-done
+if [ "$NEW_VERSION" != "latest" ]; then
+    for svc in "${ROLLING_SERVICES[@]}" import-service; do
+        docker tag "silver-carnival/${svc}:latest" "silver-carnival/${svc}:${NEW_VERSION}"
+        log "Tagged silver-carnival/${svc}:latest → silver-carnival/${svc}:${NEW_VERSION}"
+    done
+fi
 
 echo ""
 
