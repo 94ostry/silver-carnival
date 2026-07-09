@@ -5,6 +5,12 @@ services:
     image: silver-carnival/core-service:latest
     deploy:
       replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+        monitor: 30s
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/api/core/health"]
       interval: 30s
@@ -18,6 +24,12 @@ services:
     image: silver-carnival/processing-service:latest
     deploy:
       replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+        monitor: 30s
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8082/api/processing/health"]
       interval: 30s
@@ -31,6 +43,13 @@ services:
     image: silver-carnival/import-service:latest
     ports:
       - "8083:8083"
+    deploy:
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+        failure_action: rollback
+        monitor: 30s
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8083/api/import/health"]
       interval: 30s
@@ -44,6 +63,12 @@ services:
     image: silver-carnival/task-service:latest
     deploy:
       replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+        monitor: 30s
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8084/api/task/health"]
       interval: 30s
@@ -57,6 +82,13 @@ services:
     image: silver-carnival/proxy:latest
     ports:
       - "8080:8080"
+    deploy:
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+        failure_action: rollback
+        monitor: 30s
     depends_on:
       core-service:
         condition: service_healthy
